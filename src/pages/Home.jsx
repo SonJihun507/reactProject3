@@ -23,19 +23,12 @@ export const Section = styled.section`
 
 export default function Home() {
   const [month, setMonth] = useState(1);
-  const expenses = useSelector((state) => state.expenses);
-
-  console.log("expenses:", expenses);
-
-  const filteredExpenses = expenses.filter(
-    (expense) => expense.month === month
-  );
 
   return (
     <Container>
       <MonthNavigation month={month} setMonth={setMonth} />
       <CreateExpense month={month} />
-      <ExpenseList expenses={filteredExpenses} />
+      <ExpenseList />
     </Container>
   );
 }

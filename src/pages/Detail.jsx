@@ -1,64 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { editExpense, deleteExpense } from "../redux/slices/expensesSlice";
-
-const Container = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 16px;
-`;
-
-const InputGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-
-  label {
-    margin-bottom: 5px;
-    font-size: 14px;
-    color: #333;
-    text-align: left;
-  }
-
-  input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const Button = styled.button`
-  padding: 10px 20px;
-  background-color: ${(props) => (props.danger ? "#ff4d4d" : "#007bff")};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-
-  &:hover {
-    background-color: ${(props) => (props.danger ? "#cc0000" : "#0056b3")};
-  }
-`;
-
-const BackButton = styled(Button)`
-  background-color: #6c757d;
-
-  &:hover {
-    background-color: #5a6268;
-  }
-`;
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getExpense, putExpense, deleteExpense } from "../lib/api/expense";
 
 const Detail = () => {
   const navigate = useNavigate();
@@ -66,12 +12,42 @@ const Detail = () => {
   const { id } = useParams();
   const expenses = useSelector((state) => state.expenses);
 
-  const selectedExpense = expenses.find((element) => element.id === id);
+  const {
+    data: selectedExpense = [],
+    isLoading,
+    error,
+  } = useQuery({ queryKey: ["expense", id], queryFn: getExpense });
 
-  const [date, setDate] = useState(selectedExpense.date);
-  const [item, setItem] = useState(selectedExpense.item);
-  const [amount, setAmount] = useState(selectedExpense.amount);
-  const [description, setDescription] = useState(selectedExpense.description);
+  console.log(selectedExpense);
+  const [date, setDate] = useState("");
+  const [item, setItem] = useState("");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (selectedExpense) {
+      setDate(selectedExpense.date);
+      setItem(selectedExpense.item);
+      setAmount(selectedExpense.amount);
+      setDescription(selectedExpense.description);
+    }
+  }, [selectedExpense]);
+
+  const mutationEdit = useMutation({
+    mutationFn: putExpense,
+    onSuccess: () => {
+      navigate("/");
+      queryClient.invalidateQueries(["expense"]);
+    },
+  });
+
+  const mutationDelete = useMutation({
+    mutationFn: deleteExpense,
+    onSuccess: () => {
+      navigate("/");
+      queryClient.invalidateQueries(["expense"]);
+    },
+  });
 
   const handleEdit = () => {
     const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -90,17 +66,14 @@ const Detail = () => {
       id: id,
       date: date,
       item: item,
-      amount: amount,
+      amount: parseInt(amount, 10),
       description: description,
     };
-
-    dispatch(editExpense(newExpense));
-    navigate("/");
+    mutationEdit.mutate(newExpense);
   };
 
   const handleDelete = () => {
-    dispatch(deleteExpense({ id }));
-    navigate("/");
+    mutationDelete.mutate(id);
   };
 
   return (
@@ -157,3 +130,58 @@ const Detail = () => {
 };
 
 export default Detail;
+
+const Container = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 16px;
+`;
+
+const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+
+  label {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #333;
+    text-align: left;
+  }
+
+  input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const Button = styled.button`
+  padding: 10px 20px;
+  background-color: ${(props) => (props.danger ? "#ff4d4d" : "#007bff")};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: ${(props) => (props.danger ? "#cc0000" : "#0056b3")};
+  }
+`;
+
+const BackButton = styled(Button)`
+  background-color: #6c757d;
+
+  &:hover {
+    background-color: #5a6268;
+  }
+`;
