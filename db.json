@@ -64,13 +64,22 @@
       "createdBy": "Me"
     },
     {
-      "id": "8f45bc52-91c8-4046-8a85-b951e1e8baed",
+      "id": "49d0afa3-ab39-4099-a9c9-fc44833ffe36",
       "month": 1,
-      "date": "2024-01-24",
+      "date": "2024-01-01",
       "item": "테스트",
-      "amount": 123456,
+      "amount": 12345,
       "description": "테스트",
-      "createBy": "test2@"
+      "createdBy": "test2@"
+    },
+    {
+      "id": "3dea9137-7648-4445-a779-b00e9081e2f9",
+      "month": 3,
+      "date": "2024-03-01",
+      "item": "테스트2",
+      "amount": 20000,
+      "description": "테스트2",
+      "createdBy": "test2@"
     }
   ]
 }

@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const JSON_SERVER_HOST = "http://localhost:5000";
-
+const JSON_SERVER_HOST = "https://descriptive-faceted-fear.glitch.me";
 export const getExpenses = async () => {
   try {
     const response = await axios.get(`${JSON_SERVER_HOST}/expenses`);

@@ -4,6 +4,42 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getExpenses } from "../lib/api/expense";
 
+export default function ExpenseList() {
+  const navigate = useNavigate();
+
+  const {
+    data: expenses = [],
+    isLoading,
+    error,
+  } = useQuery({ queryKey: ["expense"], queryFn: getExpenses });
+
+  if (isLoading) {
+    return <div>Now Loading...</div>;
+  }
+
+  return (
+    <Section>
+      <ExpenseItemList>
+        {expenses.map((expense) => (
+          <ExpenseItem
+            key={expense.id}
+            onClick={() => {
+              navigate(`/Detail/${expense.id}`);
+            }}
+          >
+            <ExpenseDetails>
+              <span>{expense.date}</span>
+              <span>{`${expense.item} - ${expense.description}`}</span>
+            </ExpenseDetails>
+            <span>{expense.amount} 원</span>
+            <span>By {expense.createdBy}</span>
+          </ExpenseItem>
+        ))}
+      </ExpenseItemList>
+    </Section>
+  );
+}
+
 const ExpenseItemList = styled.div`
   display: flex;
   flex-direction: column;
@@ -16,6 +52,7 @@ const ExpenseItem = styled.div`
   align-items: center;
   padding: 15px 20px;
   border-radius: 8px;
+  gap: 10px;
   background-color: #f9f9f9;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease-in-out;
@@ -61,38 +98,3 @@ const ExpenseDetails = styled.div`
     }
   }
 `;
-
-export default function ExpenseList() {
-  const navigate = useNavigate();
-
-  const {
-    data: expenses = [],
-    isLoading,
-    error,
-  } = useQuery({ queryKey: ["expense"], queryFn: getExpenses });
-
-  if (isLoading) {
-    return <div>Now Loading...</div>;
-  }
-
-  return (
-    <Section>
-      <ExpenseItemList>
-        {expenses.map((expense) => (
-          <ExpenseItem
-            key={expense.id}
-            onClick={() => {
-              navigate(`/Detail/${expense.id}`);
-            }}
-          >
-            <ExpenseDetails>
-              <span>{expense.date}</span>
-              <span>{`${expense.item} - ${expense.description}`}</span>
-            </ExpenseDetails>
-            <span>{expense.amount} 원</span>
-          </ExpenseItem>
-        ))}
-      </ExpenseItemList>
-    </Section>
-  );
-}

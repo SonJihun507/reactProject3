@@ -76,7 +76,7 @@ export default function CreateExpense({ month }) {
       item: newItem,
       amount: parsedAmount,
       description: newDescription,
-      createBy: userInfo.id,
+      createdBy: userInfo.id,
     };
 
     dispatch(addExpense(newExpense));
